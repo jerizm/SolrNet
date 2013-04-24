@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using SolrNet.Impl;
 
 namespace SolrNet {
@@ -62,7 +63,7 @@ namespace SolrNet {
             }
         }
 
-        public int DistanceFromPoint { get; private set; }
+        public double DistanceFromPoint { get; private set; }
 
         /// <summary>
         /// Calculation accuracy
@@ -77,7 +78,7 @@ namespace SolrNet {
         /// <param name="pointLongitude"></param>
         /// <param name="distance"></param>
         [Obsolete("Use the constructor with the Location parameter")]
-        public SolrQueryByDistance(string fieldName, double pointLatitude, double pointLongitude, int distance) : this(fieldName, pointLatitude, pointLongitude, distance, CalculationAccuracy.Radius) {}
+        public SolrQueryByDistance(string fieldName, double pointLatitude, double pointLongitude, double distance) : this(fieldName, pointLatitude, pointLongitude, distance, CalculationAccuracy.Radius) {}
 
         /// <summary>
         /// Query by distance using <see cref="CalculationAccuracy.Radius"/>
@@ -85,9 +86,9 @@ namespace SolrNet {
         /// <param name="fieldName"></param>
         /// <param name="location"></param>
         /// <param name="distance"></param>
-        public SolrQueryByDistance(string fieldName, Location location, int distance) : this(fieldName, location, distance, CalculationAccuracy.Radius) { }
+        public SolrQueryByDistance(string fieldName, Location location, double distance) : this(fieldName, location, distance, CalculationAccuracy.Radius) { }
 
-        public SolrQueryByDistance(string fieldName, Location location, int distance, CalculationAccuracy accuracy) {
+        public SolrQueryByDistance(string fieldName, Location location, double distance, CalculationAccuracy accuracy) {
             if (string.IsNullOrEmpty(fieldName))
                 throw new ArgumentNullException("fieldName");
 
@@ -112,13 +113,13 @@ namespace SolrNet {
         /// <param name="distance"></param>
         /// <param name="accuracy"></param>
         [Obsolete("Use the constructor with the Location parameter")]
-        public SolrQueryByDistance(string fieldName, double pointLatitude, double pointLongitude, int distance, CalculationAccuracy accuracy): this(fieldName, new Location(pointLatitude, pointLongitude), distance, accuracy) {
+        public SolrQueryByDistance(string fieldName, double pointLatitude, double pointLongitude, double distance, CalculationAccuracy accuracy): this(fieldName, new Location(pointLatitude, pointLongitude), distance, accuracy) {
         }
 
         public string Query {
             get {
                 var prefix = Accuracy == CalculationAccuracy.Radius ? "{!geofilt" : "{!bbox";
-                return prefix + " pt=" + Location.ToString() + " sfield=" + FieldName + " d=" + DistanceFromPoint + "}";
+                return prefix + " pt=" + Location.ToString() + " sfield=" + FieldName + " d=" + DistanceFromPoint.ToString(CultureInfo.InvariantCulture) + "}";
             }
         }
     }
